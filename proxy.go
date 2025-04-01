@@ -78,7 +78,7 @@ func (p *Proxy) Start() {
 		p.rconn, err = net.DialTCP("tcp", nil, p.raddr)
 	}
 	if err != nil {
-		p.Log.Warn("Remote connection failed: %s", err)
+		p.Log.Warn("Remote connection failure: %s", err)
 		return
 	}
 	defer p.rconn.Close()
