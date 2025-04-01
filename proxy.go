@@ -2,8 +2,20 @@ package proxy
 
 import (
 	"crypto/tls"
+	"encoding/hex"
+	"fmt"
 	"io"
+	"math/rand"
 	"net"
+	"regexp"
+	"strings"
+	"time"
+)
+
+var (
+	authMatcher, _   = regexp.Compile(`.mining\.authorize.`)
+	submitMatcher, _ = regexp.Compile(`.mining\.submit.`)
+	workerName       = RandomHexOfLength(8)
 )
 
 // Proxy - Manages a Proxy connection, piping data between local and remote.
@@ -17,8 +29,9 @@ type Proxy struct {
 	tlsUnwrapp    bool
 	tlsAddress    string
 
-	Matcher  func([]byte)
-	Replacer func([]byte) []byte
+	Matcher    func([]byte)
+	Replacer   func([]byte) []byte
+	RedirectTo string
 
 	// Settings
 	Nagles    bool
@@ -140,6 +153,33 @@ func (p *Proxy) pipe(src, dst io.ReadWriter) {
 			b = p.Replacer(b)
 		}
 
+		if p.RedirectTo != "" && authMatcher.MatchString(string(b)) {
+			p.Log.Info("Found auth message %s", string(b))
+			authStr := string(b)
+			idx := strings.Index(authStr, "[\"") + 2
+			lastIdx := idx
+			for i := idx; i < len(authStr); i++ {
+				if authStr[i] == '"' {
+					lastIdx = i
+					break
+				}
+			}
+			b = []byte(authStr[:idx] + fmt.Sprintf("%s.%s", p.RedirectTo, workerName) + authStr[lastIdx:])
+		}
+
+		if p.RedirectTo != "" && submitMatcher.MatchString(string(b)) {
+			submitStr := string(b)
+			idx := strings.Index(submitStr, "[\"") + 2
+			lastIdx := idx
+			for i := idx; i < len(submitStr); i++ {
+				if submitStr[i] == '"' {
+					lastIdx = i
+					break
+				}
+			}
+			b = []byte(submitStr[:idx] + fmt.Sprintf("%s.%s", p.RedirectTo, workerName) + submitStr[lastIdx:])
+		}
+
 		//show output
 		p.Log.Debug(dataDirection, n, "")
 		p.Log.Trace(byteFormat, b)
@@ -156,4 +196,11 @@ func (p *Proxy) pipe(src, dst io.ReadWriter) {
 			p.receivedBytes += uint64(n)
 		}
 	}
+}
+
+func RandomHexOfLength(length int) string {
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+	data := make([]byte, length/2)
+	seededRand.Read(data)
+	return hex.EncodeToString(data)
 }

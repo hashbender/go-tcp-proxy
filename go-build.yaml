@@ -1,0 +1,36 @@
+name: Go Format and Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  format-and-build:
+    name: Format & Build Go Project
+    runs-on: tenki-bigrunner-8c-16g
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'  # Adjust to your Go version
+
+      - name: Format Go code
+        run: gofmt -s -w .
+
+      - name: Verify Formatting
+        run: |
+          if [[ -n $(gofmt -l .) ]]; then
+            echo "Go code is not formatted. Run 'gofmt -s -w .' locally."
+            exit 1
+          fi
+
+      - name: Build Go project
+        run: go build -v ./cmd/...

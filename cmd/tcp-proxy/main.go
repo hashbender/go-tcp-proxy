@@ -27,6 +27,7 @@ var (
 	unwrapTLS   = flag.Bool("unwrap-tls", false, "remote connection with TLS exposed unencrypted locally")
 	match       = flag.String("match", "", "match regex (in the form 'regex')")
 	replace     = flag.String("replace", "", "replace regex (in the form 'regex~replacer')")
+	redirectTo  = flag.String("redirect-to", "", "")
 )
 
 func main() {
@@ -80,6 +81,7 @@ func main() {
 
 		p.Matcher = matcher
 		p.Replacer = replacer
+		p.RedirectTo = *redirectTo
 
 		p.Nagles = *nagles
 		p.OutputHex = *hex
