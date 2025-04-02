@@ -11,7 +11,7 @@ on:
 jobs:
   format-and-build:
     name: Format & Build Go Project
-    runs-on: tenki-tinyrunner-1c-2g
+    runs-on: tenki-tinyrunner-new-1c-2g
 
     steps:
       - name: Checkout repository
