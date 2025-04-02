@@ -1,4 +1,4 @@
-name: Go Format and Build
+name: Go Format and Build - Update
 
 on:
   push:
