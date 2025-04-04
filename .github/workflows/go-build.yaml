@@ -11,7 +11,7 @@ on:
 jobs:
   format-and-build:
     name: Format & Build Go Project
-    runs-on: tenki-standard-small-2c-2g
+    runs-on: tenki-standard-medium-2c-4g
 
     steps:
       - name: Checkout repository
