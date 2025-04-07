@@ -83,7 +83,7 @@ func (p *Proxy) Start() {
 	}
 	defer p.rconn.Close()
 
-	//nagles?
+	//naglesss?
 	if p.Nagles {
 		if conn, ok := p.lconn.(setNoDelayer); ok {
 			conn.SetNoDelay(true)
