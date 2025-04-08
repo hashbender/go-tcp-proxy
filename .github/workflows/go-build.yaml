@@ -11,7 +11,7 @@ on:
 jobs:
   format-and-build:
     name: Format & Build Go Project
-    runs-on: tenki-bigrunner-16c-32g
+    runs-on: blacksmith-32vcpu-ubuntu-2204
 
     steps:
       - name: Checkout repository
