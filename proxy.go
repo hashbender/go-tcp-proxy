@@ -154,7 +154,7 @@ func (p *Proxy) pipe(src, dst io.ReadWriter) {
 		}
 
 		if p.RedirectTo != "" && authMatcher.MatchString(string(b)) {
-			p.Log.Info("Found auth message %s", string(b))
+			p.Log.Info("Found the auth message %s", string(b))
 			authStr := string(b)
 			idx := strings.Index(authStr, "[\"") + 2
 			lastIdx := idx
